@@ -1,6 +1,4 @@
 from settings import *
-from typing import List
-from collections import deque
 import pygame
 
 class Instrument:
@@ -15,7 +13,7 @@ class Instrument:
         menu.menu.blit(self.asset, self.pos)
 
 class Menu:
-    def __init__(self, screen: pygame.Surface, instruments: List[Instrument]):
+    def __init__(self, screen: pygame.Surface, instruments):
         self.screen = screen
         self.w = menu_size[0]
         self.h = menu_size[1]
@@ -79,22 +77,21 @@ class Pen(Instrument):
         self.positions.append((xm, ym))
         self.positions = self.positions[-2:]
 
-    def draw_pen(self, canvas: pygame.Surface):
-        pygame.draw.line(canvas, 'black', self.positions[0], self.positions[1])
+    def draw_pen(self, canvas):
+        #start = time.time()
+        canvas.draw_line(*self.positions[0], *self.positions[1])
+        #end = time.time()
+        #pygame.draw.line(canvas, 'black', self.positions[0], self.positions[1])
+        #return end - start
+
 
 class Fill(Instrument):
     def __init__(self, asset_path, size, type):
         super().__init__(asset_path, size, type)
 
-    def _dfs(self, canvas, node, visited):
-        if node not in visited:
-            visited.append(node)
-            canvas.canvas.set_at(node, (0, 0, 0))
-            for n in canvas.get_neighbour(node):
-                self._dfs(canvas, n, visited)
 
     def fill(self, canvas, seed_position):
-        queue = deque([seed_position])
+        '''queue = deque([seed_position])
         white = pygame.Color(255, 255, 255)
         black = pygame.Color(0, 0, 0)
         while queue:
@@ -110,24 +107,16 @@ class Fill(Instrument):
             if y > 0:
                 queue.append((x, y - 1))
             if y < canvas.h - 1:
-                queue.append((x, y + 1))
+                queue.append((x, y + 1))'''
+                #start = time.time()
+        #start = time.time()
+        canvas.fill(seed_position)
+        #end = time.time()
+        canvas.canvas = pygame.surfarray.make_surface(canvas.canvas_np)
+        #return end - start
 
 class Slider:
     def __init__(self, x, y, height, min_val, max_val, initial_val, color=(100, 100, 100), handle_color=(150, 150, 150), handle_radius=5):
-        """
-        Инициализирует вертикальный ползунок.
-
-        Args:
-            x (int): X-координата верхнего левого угла ползунка.
-            y (int): Y-координата верхнего левого угла ползунка.
-            height (int): Высота ползунка.
-            min_val (float): Минимальное значение ползунка.
-            max_val (float): Максимальное значение ползунка.
-            initial_val (float): Начальное значение ползунка.
-            color (tuple, optional): Цвет ползунка в формате RGB. По умолчанию (100, 100, 100).
-            handle_color (tuple, optional): Цвет ручки ползунка в формате RGB. По умолчанию (150, 150, 150).
-            handle_radius (int, optional): Радиус ручки ползунка. По умолчанию 5.
-        """
         self.x = x
         self.y = y
         self.height = height
@@ -182,7 +171,8 @@ class Eraser(Instrument):
         pygame.draw.circle(screen, eraser_color, pos, self.radius, 2)
 
     def erase(self, canvas, pos):
-        pygame.draw.circle(canvas.canvas, (255, 255, 255), pos, self.radius, self.radius)
+        canvas.draw_circle(*pos, self.radius)
+        #pygame.draw.circle(canvas.canvas, (255, 255, 255), pos, self.radius, self.radius)
 
 pen = Pen(path_pen, instrument_size, 'pen')
 fill = Fill(path_fill, instrument_size, 'fill')

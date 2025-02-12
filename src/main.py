@@ -1,6 +1,3 @@
-import sys
-sys.setrecursionlimit(10**6)
-
 from settings import *
 import menutools
 import canvas
@@ -11,6 +8,7 @@ pygame.display.set_caption('Drawing App')
 clock = pygame.time.Clock()
 
 canvas = canvas.Canvas(screen)
+
 menu = menutools.Menu(screen, menutools.instruments_list)
 
 is_onscreen = False
@@ -45,6 +43,17 @@ while True:
 
     # canvas
     screen.fill('white')
+
+    #canvas.canvas_np = np.ones((*canvas_size, 3), dtype=np.uint8) * 255
+    #cv2.circle(canvas.canvas_np, (300, 400), 100, (0, 0, 0), 1)
+    #canvas.canvas = pygame.surfarray.make_surface(canvas.canvas_np)
+
+    #start = time.time()
+    #menutools.fill.fill(canvas, (300, 400))
+    #end = time.time()
+    #print('filled in: ', str(end-start))
+    #times.append(end-start)
+
     canvas.draw(50, 0)
 
     # menu
@@ -58,9 +67,18 @@ while True:
             if not menutools.pen.positions:
                 menutools.pen.add_start_point(xm-50, ym)
             menutools.pen.add(xm-50, ym)
-            menutools.pen.draw_pen(canvas.canvas)
+            menutools.pen.draw_pen(canvas)
         elif menu.get_choosed == 'fill':
-            menutools.fill.fill(canvas, (xm-50, ym))
+            #plt.imshow(canvas.canvas_np)
+            #plt.title('before')
+            #plt.show()
+
+            #print(f'Filled in: {menutools.fill.fill(canvas, (ym, xm-50))}')
+            menutools.fill.fill(canvas, (ym, xm-50))
+
+            #plt.imshow(canvas.canvas_np)
+            #plt.title('after')
+            #plt.show()
         elif menu.get_choosed == 'erase':
             menutools.eraser.erase(canvas, (xm-50, ym))
 
